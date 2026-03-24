@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact via Gmail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f7f9fc; font-family: 'Helvetica', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* উপরের অর্ধেকের ফটো সেকশন */
+        .top-half { height: 48vh; width: 100%; display: flex; align-items: center; justify-content: center; background-color: white; border-bottom: 1px solid #e1e4e8; padding: 10px; box-sizing: border-box; }
+        .top-half img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; }
+        
+        /* নিচের অর্ধেকের কন্টেন্ট সেকশন */
+        .bottom-half { height: 52vh; width: 100%; background: #f7f9fc; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+
+        /* স্ট্যাটাস চিহ্ন (টিক মার্ক) */
+        .status-icon { width: 70px; height: 70px; border-radius: 50%; background: #22c55e; color: white; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); }
+        
+        /* মেসেজ টেক্সট */
+        .message-box { font-size: 24px; font-weight: 800; color: #1c1e21; margin-bottom: 5px; }
+        .sub-text { font-size: 16px; color: #606770; margin-bottom: 15px; }
+        
+        /* সেন্ড বাটন */
+        .btn-send { width: 100%; max-width: 350px; background-color: #ea4335; color: white; font-weight: bold; padding: 18px; border-radius: 15px; cursor: pointer; border: none; font-size: 20px; text-decoration: none; display: inline-block; text-align: center; transition: 0.3s; box-shadow: 0 4px 12px rgba(234, 67, 53, 0.3); }
+        
+        .btn-send:hover { background-color: #d93025; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <div class="top-half">
+        <img src="https://raw.githubusercontent.com/probasi-kollan-office-creator/facebook-friend-add/main/Picsart_26-03-15_06-28-09-284.jpg" alt="Website Photo">
+    </div>
+
+    <div class="bottom-half text-center">
+        
+        <div class="status-icon">✓</div>
+
+        <h2 class="message-box">হাই কেমন আছো</h2>
+        <p class="sub-text">মেসেজটি পাঠাতে নিচের বাটনে ক্লিক করুন</p>
+
+        <a href="mailto:Priyaakter200302@gmail.com?subject=Hello&body=হাই কেমন আছো" class="btn-send">
+            Send Message
+        </a>
+
+        <p class="mt-4 text-xs text-gray-400 font-semibold uppercase tracking-widest">Auto Setup via Gmail</p>
+    </div>
+
+</body>
+</html>
