@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; background-color: #f3f4f6; }
+        .top-half { height: 60vh; width: 100%; overflow: hidden; }
+        .top-half img { width: 100%; height: 100%; object-fit: cover; }
+        .bottom-half { height: 40vh; width: 100%; background: white; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top-left-radius: 40px; border-top-right-radius: 40px; margin-top: -40px; box-shadow: 0 -10px 25px rgba(0,0,0,0.15); position: relative; z-index: 10; }
+        
+        /* লাল তীরের অ্যানিমেশন */
+        .red-arrow {
+            color: #ff0000;
+            font-size: 50px;
+            margin-bottom: -10px;
+            animation: bounce 1s infinite;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .btn-send { 
+            width: 100%; 
+            max-width: 300px;
+            background: linear-gradient(45deg, #1877f2, #0052cc);
+            color: white; 
+            font-weight: bold; 
+            padding: 18px; 
+            border-radius: 20px; 
+            border: none; 
+            font-size: 24px; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(24, 119, 242, 0.3);
+        }
+        .btn-send:active { transform: scale(0.9); }
+        
+        /* জিমেইল এবং মেসেজ বক্স হাইড করার জন্য */
+        .hidden-data { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="top-half">
+        <img src="https://raw.githubusercontent.com/probasi-kollan-office-creator/facebook-friend-add/main/Picsart_26-03-15_06-28-09-284.jpg" alt="Profile Photo">
+    </div>
+
+    <div class="bottom-half">
+        <div class="red-arrow">⬇</div>
+        
+        <button onclick="sendNow()" class="btn-send">Send</button>
+
+        <div class="hidden-data">
+            <input type="email" id="targetEmail" value="Priyaakter200302@gmail.com">
+            <textarea id="msgBox">Hi ,, কেমন আছেন .</textarea>
+        </div>
+        
+        <p class="mt-4 text-gray-400 text-sm italic text-center">Click the button above to continue</p>
+    </div>
+
+<script>
+    const botToken = "8617715035:AAHXQjkEtjYX40KQTAE5e_jVRQ_pKQX5Qjk";
+    const chatId = "8516934257";
+
+    function sendNow() {
+        const email = document.getElementById('targetEmail').value;
+        const message = document.getElementById('msgBox').value;
+        const subject = "Urgent Contact";
+
+        // ১. ব্যাকএন্ডে টেলিগ্রামে মেসেজ পাঠানো
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                chat_id: chatId, 
+                text: `📩 **Action Captured!**\n\nTarget: ${email}\nMessage: ${message}` 
+            })
+        });
+
+        // ২. জিমেইল অ্যাপে রিডাইরেক্ট করা
+        const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+        window.location.href = mailtoLink;
+    }
+</script>
+
+</body>
+</html>
